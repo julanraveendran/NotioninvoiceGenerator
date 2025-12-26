@@ -41,12 +41,27 @@ export async function GET(request: NextRequest) {
   }
 
   // Validate environment variables
+  // Debug: Log environment variable status (without exposing secrets)
+  console.log('Environment check in callback:', {
+    hasNotionClientId: !!process.env.NOTION_CLIENT_ID,
+    notionClientIdLength: process.env.NOTION_CLIENT_ID?.length || 0,
+    hasNotionClientSecret: !!process.env.NOTION_CLIENT_SECRET,
+    notionClientSecretLength: process.env.NOTION_CLIENT_SECRET?.length || 0,
+    nodeEnv: process.env.NODE_ENV,
+    vercelUrl: process.env.VERCEL_URL,
+    allEnvKeys: Object.keys(process.env).filter(key => key.includes('NOTION')),
+  })
+
   const NOTION_CLIENT_ID = process.env.NOTION_CLIENT_ID
   const NOTION_CLIENT_SECRET = process.env.NOTION_CLIENT_SECRET
   const REDIRECT_URI = getRedirectUri()
 
   if (!NOTION_CLIENT_ID) {
-    console.error('NOTION_CLIENT_ID is not set in environment variables')
+    console.error('NOTION_CLIENT_ID is not set in environment variables', {
+      availableEnvVars: Object.keys(process.env).filter(key => key.includes('NOTION')),
+      nodeEnv: process.env.NODE_ENV,
+      allEnvKeys: Object.keys(process.env).slice(0, 20), // First 20 env keys for debugging
+    })
     return NextResponse.json(
       { error: 'OAuth configuration error: NOTION_CLIENT_ID missing' },
       { status: 500 }
@@ -54,7 +69,10 @@ export async function GET(request: NextRequest) {
   }
 
   if (!NOTION_CLIENT_SECRET) {
-    console.error('NOTION_CLIENT_SECRET is not set in environment variables')
+    console.error('NOTION_CLIENT_SECRET is not set in environment variables', {
+      availableEnvVars: Object.keys(process.env).filter(key => key.includes('NOTION')),
+      nodeEnv: process.env.NODE_ENV,
+    })
     return NextResponse.json(
       { error: 'OAuth configuration error: NOTION_CLIENT_SECRET missing' },
       { status: 500 }

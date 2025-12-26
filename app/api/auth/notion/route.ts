@@ -26,11 +26,23 @@ function getRedirectUri(): string {
 
 export async function GET(request: NextRequest) {
   try {
+    // Debug: Log environment variable status (without exposing secrets)
+    console.log('Environment check:', {
+      hasNotionClientId: !!process.env.NOTION_CLIENT_ID,
+      notionClientIdLength: process.env.NOTION_CLIENT_ID?.length || 0,
+      nodeEnv: process.env.NODE_ENV,
+      vercelUrl: process.env.VERCEL_URL,
+      allEnvKeys: Object.keys(process.env).filter(key => key.includes('NOTION')),
+    })
+
     const NOTION_CLIENT_ID = process.env.NOTION_CLIENT_ID
     const REDIRECT_URI = getRedirectUri()
 
     if (!NOTION_CLIENT_ID) {
-      console.error('NOTION_CLIENT_ID is not set in environment variables')
+      console.error('NOTION_CLIENT_ID is not set in environment variables', {
+        availableEnvVars: Object.keys(process.env).filter(key => key.includes('NOTION')),
+        nodeEnv: process.env.NODE_ENV,
+      })
       return NextResponse.json(
         { error: 'OAuth configuration error: NOTION_CLIENT_ID missing' },
         { status: 500 }
