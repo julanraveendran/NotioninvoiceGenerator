@@ -107,18 +107,28 @@ See [NOTION_SETUP.md](./NOTION_SETUP.md) for complete setup instructions.
 
 ## Environment Variables
 
+### Local Development
+
 Create a `.env.local` file with:
 
-- `NOTION_CLIENT_ID` - Your Notion OAuth Client ID (optional, has default)
-- `NOTION_CLIENT_SECRET` - Your Notion OAuth Client Secret (required for production)
-- `NOTION_REDIRECT_URI` - The OAuth redirect URI (must match Notion settings, defaults to localhost:3001)
+- `NOTION_CLIENT_ID` - Your Notion OAuth Client ID
+- `NOTION_CLIENT_SECRET` - Your Notion OAuth Client Secret
+- `NOTION_REDIRECT_URI` - The OAuth redirect URI (optional, defaults to localhost:3001)
 
-## OAuth Credentials
+### Vercel Production
 
-The OAuth client ID and secret are currently hardcoded in the API routes. In production, you should:
-- Move these to environment variables
-- Use secure secret management
-- Never commit secrets to version control
+Set these environment variables in your Vercel project settings:
+- `NOTION_CLIENT_ID` - Required
+- `NOTION_CLIENT_SECRET` - Required
+- `NOTION_REDIRECT_URI` - Optional (auto-detected from VERCEL_URL)
+
+See [VERCEL_DEPLOYMENT.md](./VERCEL_DEPLOYMENT.md) for detailed deployment instructions.
+
+## Security
+
+✅ OAuth credentials are stored in environment variables, not in the code.
+✅ The app automatically detects the correct redirect URI based on the environment.
+✅ All secrets are excluded from git via `.gitignore`.
 
 ## License
 
