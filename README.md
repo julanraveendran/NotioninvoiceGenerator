@@ -35,10 +35,14 @@ A React web app that connects to Notion via OAuth, fetches data from your databa
 npm install
 ```
 
-2. Create a `.env.local` file in the root directory (optional - defaults to localhost:3000):
+2. Create a `.env.local` file in the root directory:
 ```env
-NOTION_REDIRECT_URI=http://localhost:3000/api/auth/notion/callback
+NOTION_CLIENT_ID=your_notion_client_id_here
+NOTION_CLIENT_SECRET=your_notion_client_secret_here
+NOTION_REDIRECT_URI=http://localhost:3001/api/auth/notion/callback
 ```
+
+**Note:** The app includes default values for local development, but you should set these environment variables for production use.
 
 3. Configure Notion OAuth (see [NOTION_SETUP.md](./NOTION_SETUP.md) for detailed instructions)
 
@@ -103,7 +107,11 @@ See [NOTION_SETUP.md](./NOTION_SETUP.md) for complete setup instructions.
 
 ## Environment Variables
 
-- `NOTION_REDIRECT_URI` - The OAuth redirect URI (must match Notion settings)
+Create a `.env.local` file with:
+
+- `NOTION_CLIENT_ID` - Your Notion OAuth Client ID (optional, has default)
+- `NOTION_CLIENT_SECRET` - Your Notion OAuth Client Secret (required for production)
+- `NOTION_REDIRECT_URI` - The OAuth redirect URI (must match Notion settings, defaults to localhost:3001)
 
 ## OAuth Credentials
 
