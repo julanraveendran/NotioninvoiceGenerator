@@ -3,25 +3,36 @@ import { NextRequest, NextResponse } from 'next/server'
 function getRedirectUri(): string {
   // Priority: explicit env var > dynamic based on environment
   if (process.env.NOTION_REDIRECT_URI) {
+    console.log('Using explicit NOTION_REDIRECT_URI:', process.env.NOTION_REDIRECT_URI)
     return process.env.NOTION_REDIRECT_URI
   }
 
   if (process.env.NODE_ENV === 'production') {
     // Vercel provides VERCEL_URL (e.g., 'your-app.vercel.app')
+    // Note: VERCEL_URL might not include https://, so we add it
     const vercelUrl = process.env.VERCEL_URL
     if (vercelUrl) {
-      return `https://${vercelUrl}/api/auth/notion/callback`
+      // Ensure it doesn't already have https://
+      const url = vercelUrl.startsWith('https://') ? vercelUrl : `https://${vercelUrl}`
+      const redirectUri = `${url}/api/auth/notion/callback`
+      console.log('Using VERCEL_URL for redirect URI:', redirectUri)
+      return redirectUri
     }
-    // Fallback: use VERCEL_BRANCH_URL or construct from NEXT_PUBLIC_VERCEL_URL if available
+    // Fallback: use VERCEL_BRANCH_URL if available
     const branchUrl = process.env.VERCEL_BRANCH_URL
     if (branchUrl) {
-      return `https://${branchUrl}/api/auth/notion/callback`
+      const url = branchUrl.startsWith('https://') ? branchUrl : `https://${branchUrl}`
+      const redirectUri = `${url}/api/auth/notion/callback`
+      console.log('Using VERCEL_BRANCH_URL for redirect URI:', redirectUri)
+      return redirectUri
     }
     console.error('Production environment detected but no VERCEL_URL found. Set NOTION_REDIRECT_URI explicitly.')
   }
 
   // Development default
-  return 'http://localhost:3001/api/auth/notion/callback'
+  const devUri = 'http://localhost:3001/api/auth/notion/callback'
+  console.log('Using development redirect URI:', devUri)
+  return devUri
 }
 
 export async function GET(request: NextRequest) {
@@ -38,6 +49,16 @@ export async function GET(request: NextRequest) {
     const NOTION_CLIENT_ID = process.env.NOTION_CLIENT_ID
     const REDIRECT_URI = getRedirectUri()
 
+    // Debug: Log the redirect URI being used
+    console.log('OAuth initiation - Redirect URI:', {
+      redirectUri: REDIRECT_URI,
+      encodedRedirectUri: encodeURIComponent(REDIRECT_URI),
+      vercelUrl: process.env.VERCEL_URL,
+      vercelBranchUrl: process.env.VERCEL_BRANCH_URL,
+      notionRedirectUri: process.env.NOTION_REDIRECT_URI,
+      nodeEnv: process.env.NODE_ENV,
+    })
+
     if (!NOTION_CLIENT_ID) {
       console.error('NOTION_CLIENT_ID is not set in environment variables', {
         availableEnvVars: Object.keys(process.env).filter(key => key.includes('NOTION')),
@@ -50,6 +71,11 @@ export async function GET(request: NextRequest) {
     }
 
     const authUrl = `https://api.notion.com/v1/oauth/authorize?client_id=${NOTION_CLIENT_ID}&response_type=code&owner=user&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`
+    
+    console.log('Redirecting to Notion OAuth:', {
+      authUrl: authUrl.substring(0, 100) + '...', // Log partial URL for debugging
+      redirectUriInUrl: REDIRECT_URI,
+    })
     
     return NextResponse.redirect(authUrl)
   } catch (error) {
