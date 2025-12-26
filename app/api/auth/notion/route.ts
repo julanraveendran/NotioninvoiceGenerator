@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-function getRedirectUri(): string {
+function getRedirectUri(request?: NextRequest): string {
   // Priority: explicit env var > dynamic based on environment
   if (process.env.NOTION_REDIRECT_URI) {
     console.log('Using explicit NOTION_REDIRECT_URI:', process.env.NOTION_REDIRECT_URI)
@@ -8,7 +8,16 @@ function getRedirectUri(): string {
   }
 
   if (process.env.NODE_ENV === 'production') {
-    // Vercel provides VERCEL_URL (e.g., 'your-app.vercel.app')
+    // Try to get the URL from the request first (most reliable)
+    if (request) {
+      const url = new URL(request.url)
+      const origin = url.origin
+      const redirectUri = `${origin}/api/auth/notion/callback`
+      console.log('Using request origin for redirect URI:', redirectUri)
+      return redirectUri
+    }
+
+    // Fallback: Vercel provides VERCEL_URL (e.g., 'your-app.vercel.app')
     // Note: VERCEL_URL might not include https://, so we add it
     const vercelUrl = process.env.VERCEL_URL
     if (vercelUrl) {
@@ -47,7 +56,7 @@ export async function GET(request: NextRequest) {
     })
 
     const NOTION_CLIENT_ID = process.env.NOTION_CLIENT_ID
-    const REDIRECT_URI = getRedirectUri()
+    const REDIRECT_URI = getRedirectUri(request)
 
     // Debug: Log the redirect URI being used
     console.log('OAuth initiation - Redirect URI:', {
