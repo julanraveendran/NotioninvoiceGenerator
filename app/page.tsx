@@ -1,73 +1,51 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { FileText } from 'lucide-react'
+import { useRef } from 'react'
+import InvoiceApp from './components/InvoiceApp'
+import { ArrowRight } from 'lucide-react'
 
 export default function Home() {
-  const router = useRouter()
-  const [error, setError] = useState<string | null>(null)
+  const appSectionRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    // Check for error in URL params
-    const params = new URLSearchParams(window.location.search)
-    const errorParam = params.get('error')
-    if (errorParam) {
-      setError('Authentication failed. Please try again.')
-    }
-  }, [])
-
-  const handleLogin = () => {
-    window.location.href = '/api/auth/notion'
+  const scrollToApp = () => {
+    appSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-gray-50 to-gray-100">
-      <div className="w-full max-w-md">
-        <div className="bg-white rounded-2xl shadow-xl p-8">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
-              <FileText className="w-8 h-8 text-blue-600" />
-            </div>
-            <h1 className="text-4xl font-bold text-gray-800 mb-2">
-              Notion Invoice Generator
-            </h1>
-            <p className="text-gray-600">
-              Connect your Notion workspace to generate professional invoices
-            </p>
-          </div>
+    <main className="min-h-screen bg-white">
+      {/* Hero Section */}
+      <section className="max-w-4xl mx-auto px-6 py-20 md:py-32">
+        <div className="text-center">
+          {/* H1 */}
+          <h1 className="text-5xl md:text-6xl font-semibold text-gray-900 mb-6 leading-tight tracking-tight">
+            Turn Notion Pages into Professional Invoices
+          </h1>
 
-          {/* Error Message */}
-          {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-sm text-red-600">{error}</p>
-            </div>
-          )}
+          {/* Sub-headline */}
+          <p className="text-xl md:text-2xl text-gray-600 mb-6 max-w-2xl mx-auto font-normal">
+            The fastest way for freelancers and agencies to get paid without leaving their Notion workspace.
+          </p>
 
-          {/* Login Button */}
+          {/* SEO Paragraph */}
+          <p className="text-base md:text-lg text-gray-500 mb-10 max-w-2xl mx-auto leading-relaxed">
+            PaidInBlocks is a free Notion Invoice Generator that lets you transform your Notion database entries into professional, branded invoices in seconds. Connect your workspace, select your projects, and download polished PDF invoices—all without switching tools or learning complex software.
+          </p>
+
+          {/* CTA Button */}
           <button
-            onClick={handleLogin}
-            className="w-full bg-gray-900 hover:bg-gray-800 text-white font-semibold py-4 px-6 rounded-lg transition-all flex items-center justify-center gap-3 shadow-md hover:shadow-lg"
+            onClick={scrollToApp}
+            className="inline-flex items-center gap-2 bg-gray-900 hover:bg-gray-800 text-white font-medium px-6 py-3 md:px-8 md:py-4 rounded-md transition-all border border-gray-900 hover:border-gray-800"
+            aria-label="Scroll to invoice generator"
           >
-            <svg
-              className="w-5 h-5"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path d="M10 2a8 8 0 100 16 8 8 0 000-16zm0 2a6 6 0 110 12 6 6 0 010-12z" />
-            </svg>
-            Login with Notion
+            Generate Invoice Now
+            <ArrowRight className="w-4 h-4 md:w-5 md:h-5" />
           </button>
-
-          {/* Info */}
-          <div className="mt-6 text-center">
-            <p className="text-sm text-gray-500">
-              You'll be redirected to Notion to authorize this app
-            </p>
-          </div>
         </div>
+      </section>
+
+      {/* Invoice App Section */}
+      <div ref={appSectionRef}>
+        <InvoiceApp />
       </div>
     </main>
   )

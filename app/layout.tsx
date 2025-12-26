@@ -1,9 +1,17 @@
 import type { Metadata } from 'next'
+import { Inter } from 'next/font/google'
 import './globals.css'
 
+const inter = Inter({ subsets: ['latin'] })
+
 export const metadata: Metadata = {
-  title: 'Notion Invoice Generator',
-  description: 'Generate professional invoices from your Notion databases',
+  title: 'Free Notion Invoice Generator | PaidInBlocks',
+  description: 'The fastest way for freelancers to turn Notion pages into professional invoices.',
+  openGraph: {
+    title: 'Free Notion Invoice Generator | PaidInBlocks',
+    description: 'The fastest way for freelancers to turn Notion pages into professional invoices.',
+    type: 'website',
+  },
 }
 
 export default function RootLayout({
@@ -13,7 +21,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body className={inter.className}>{children}</body>
     </html>
   )
 }
